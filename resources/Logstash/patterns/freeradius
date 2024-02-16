@@ -1,0 +1,23 @@
+# Arquivo testado com Login OK, Incorreto e Invalido
+#DEFAULT
+FREERADIUS_DATE %{DAY}%{SPACE}%{MONTH}%{SPACE}?%{MONTHDAY}%{SPACE}%{TIME}%{SPACE}%{YEAR}
+FREERADIUS_LOGTYPE Auth|Info|Error|Proxy
+FREERADIUS_CLIENT %{NOTSPACE:radius_client}
+FREERADIUS_PORT %{INT:radius_port}
+FREERADIUS_CLI %{NOTSPACE:radius_cli}
+FREERADIUS_VIA %{DATA:RADIUS_MAC}
+FREERADIUS_FROM \(from client %{FREERADIUS_CLIENT} port %{FREERADIUS_PORT} (?:cli|via) %{FREERADIUS_VIA} %{DATA}\)
+FREERADIUS_USERNAME %{DATA:username}
+FREERADIUS_REASON (?:\(%{DATA:radius_reason}\))?:
+FREERADIUS_MODULE \brlm_[a-z]+\b
+
+
+#Ver.: 1.7
+# Auth log lines
+FREERADIUS_LOGINOK %{SPACE}%{DATA:Status}:%{SPACE}\[%{FREERADIUS_USERNAME}\]%{SPACE}\(from client %{FREERADIUS_CLIENT} port %{FREERADIUS_PORT} (?:cli|via) %{FREERADIUS_VIA} %{DATA}\)
+FREERADIUS_LOGININCORRECT %{SPACE}%{DATA:Status} (?:\(%{DATA:radius_reason}\))?: (?:%{DATA:username}) \(from client %{NOTSPACE:radius_client} port %{INT:radius_port}(?: cli %{NOTSPACE:radius_cli})?(?: via %{DATA:radius_via})?\)
+FREERADIUS_INVALIDUSER %{SPACE}%{DATA:Status} (?:\(%{DATA:radius_reason}\))?: (?:%{DATA:username}) \(from client %{NOTSPACE:radius_client} port %{INT:radius_port}(?: cli %{NOTSPACE:radius_cli})?(?: via %{DATA:radius_via})?\)
+FREERADIUS_AUTH (?:%{FREERADIUS_LOGINOK}|%{FREERADIUS_LOGININCORRECT}|%{FREERADIUS_INVALIDUSER})
+
+# Main match on whole log line:
+FREERADIUS_LINE %{FREERADIUS_DATE:timestamp} : %{FREERADIUS_LOGTYPE:fr_logclass}: \(%{FREERADIUS_CLI}\)
